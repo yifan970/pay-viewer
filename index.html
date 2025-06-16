@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付体系报告查看器 - 2020年</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #1a237e, #ff9800, #1a237e);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #1a237e;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo i {
+            font-size: 3rem;
+            color: #fff;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            color: #1a237e;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+        
+        .year-badge {
+            background: #ff9800;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: inline-block;
+            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+        }
+        
+        .container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            flex: 1;
+            margin-bottom: 20px;
+        }
+        
+        .viewer-container {
+            flex: 3;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #pdf-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        #pdf-viewer {
+            flex: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: auto;
+            background: #f5f7fa;
+            margin-bottom: 20px;
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .pdf-page {
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid #ddd;
+            transition: transform 0.3s ease;
+        }
+        
+        .pdf-page:hover {
+            transform: scale(1.02);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            background: #ff9800;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn.zoom {
+            padding: 10px 15px;
+        }
+        
+        .page-info {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a237e;
+            background: #e8eaf6;
+            padding: 10px 20px;
+            border-radius: 50px;
+            min-width: 120px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .zoom-level {
+            font-size: 1rem;
+            color: #555;
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 500;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff9800;
+        }
+        
+        .panel-header i {
+            font-size: 1.8rem;
+            color: #1a237e;
+        }
+        
+        .panel-header h2 {
+            font-size: 1.6rem;
+            color: #1a237e;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-info {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .info-label i {
+            color: #1a237e;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .info-label span {
+            font-weight: 600;
+            color: #1a237e;
+        }
+        
+        .info-value {
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            word-break: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .highlights {
+            margin-top: 15px;
+        }
+        
+        .highlight {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .highlight:hover {
+            transform: translateX(5px);
+            background: #bbdefb;
+        }
+        
+        .highlight i {
+            color: #1a237e;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .navigation-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .tool {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool label {
+            font-weight: 600;
+            color: #1a237e;
+            min-width: 70px;
+        }
+        
+        #jump-input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 80px;
+            font-size: 1rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .instructions h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1a237e;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .instructions ul {
+            padding-left: 25px;
+        }
+        
+        .instructions li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .instructions li:before {
+            content: "•";
+            color: #ff9800;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #1a237e, #ff9800, #1a237e);
+        }
+        
+        .footer p {
+            color: #555;
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+        
+        .footer p:first-child {
+            font-weight: 500;
+            color: #1a237e;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(26, 35, 126, 0.2);
+            border-top: 5px solid #1a237e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+            color: #1a237e;
+            font-weight: 500;
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 30px;
+            color: #f44336;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .error-message i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #f44336;
+        }
+        
+        .error-message h2 {
+            margin-bottom: 15px;
+        }
+        
+        .error-message p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .error-message ul, .error-message ol {
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        .error-message li {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 1100px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .page-info {
+                order: 1;
+            }
+            
+            .zoom-controls {
+                order: 2;
+            }
+            
+            .tool {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            #jump-input {
+                width: 100%;
+            }
+            
+            #jump-btn {
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <h1>2020年支付体系运行总体情况</h1>
+        <p>中国人民银行支付结算司发布的年度支付体系运行报告</p>
+        <div class="year-badge">
+            <i class="fas fa-calendar-alt"></i> 2020年度报告
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="viewer-container">
+            <div id="pdf-container">
+                <div id="pdf-viewer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text">正在加载支付体系报告...</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="prev-page" class="btn">
+                        <i class="fas fa-arrow-left"></i> 上一页
+                    </button>
+                    
+                    <div class="page-info">
+                        <span id="page-num">1</span> / <span id="page-count">?</span>
+                    </div>
+                    
+                    <button id="next-page" class="btn">
+                        下一页 <i class="fas fa-arrow-right"></i>
+                    </button>
+                    
+                    <div class="zoom-controls">
+                        <button id="zoom-out" class="btn zoom">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <span class="zoom-level"><span id="zoom-percent">120</span>%</span>
+                        <button id="zoom-in" class="btn zoom">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="panel-header">
+                <i class="fas fa-info-circle"></i>
+                <h2>报告信息</h2>
+            </div>
+            
+            <div class="report-info">
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>文件名称:</span>
+                    </div>
+                    <div class="info-value">2020_payment_system_report.pdf</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-building"></i>
+                        <span>发布机构:</span>
+                    </div>
+                    <div class="info-value">中国人民银行支付结算司</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-calendar"></i>
+                        <span>发布日期:</span>
+                    </div>
+                    <div class="info-value">2021年3月</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-chart-line"></i>
+                        <span>核心数据:</span>
+                    </div>
+                    <div class="info-value">
+                        <div class="highlights">
+                            <div class="highlight">
+                                <i class="fas fa-money-check-alt"></i>
+                                <div>非现金支付业务金额同比增长24.1%</div>
+                            </div>
+                            <div class="highlight">
+                                <i class="fas fa-credit-card"></i>
+                                <div>银行卡交易金额同比增长12.0%</div>
+                            </div>
+                            <div class="highlight">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>移动支付业务同比增长25.1%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="navigation-tools">
+                <div class="tool">
+                    <label for="jump-input">跳转到:</label>
+                    <input type="number" id="jump-input" min="1" value="1">
+                    <button id="jump-btn" class="btn">跳转</button>
+                </div>
+                
+                <div class="tool">
+                    <button id="fullscreen-btn" class="btn">
+                        <i class="fas fa-expand"></i> 全屏模式
+                    </button>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-lightbulb"></i> 使用说明</h3>
+                <ul>
+                    <li>使用"上一页/下一页"按钮浏览报告</li>
+                    <li>使用缩放按钮调整页面大小（+/-）</li>
+                    <li>输入页码并按Enter键跳转至指定页</li>
+                    <li>全屏模式提供更好的阅读体验</li>
+                    <li>使用VS Code的Live Server运行此页面</li>
+                    <li>确保PDF文件位于项目根目录</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2023 支付体系报告查看器 | 基于PDF.js构建 | 项目文件夹: PAY-VIEWER</p>
+        <p>提示: 使用VS Code的Live Server扩展运行此页面</p>
+    </div>
+
+    <script>
+        // 设置PDF.js worker路径
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        
+        // 获取DOM元素
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const pageNumElem = document.getElementById('page-num');
+        const pageCountElem = document.getElementById('page-count');
+        const zoomPercentElem = document.getElementById('zoom-percent');
+        const jumpInput = document.getElementById('jump-input');
+        const jumpBtn = document.getElementById('jump-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        
+        // 初始化变量
+        let pdfDoc = null;
+        let currentPage = 1;
+        let scale = 1.2;
+        
+        // 指定PDF文件路径（相对路径）
+        const pdfPath = './2020_payment_system_report.pdf';
+        
+        // 渲染PDF页面
+        function renderPage(num) {
+            pdfViewer.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">正在加载第 ' + num + ' 页...</div></div>';
+            
+            pdfDoc.getPage(num).then(function(page) {
+                const viewport = page.getViewport({ scale: scale });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvas.className = 'pdf-page';
+                
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                
+                renderTask.promise.then(function() {
+                    pdfViewer.innerHTML = '';
+                    pdfViewer.appendChild(canvas);
+                });
+            }).catch(function(error) {
+                console.error('渲染页面失败:', error);
+                pdfViewer.innerHTML = '<div class="error-message">渲染页面失败: ' + error.message + '</div>';
+            });
+            
+            // 更新页面信息
+            pageNumElem.textContent = currentPage;
+            pageCountElem.textContent = pdfDoc.numPages;
+            zoomPercentElem.textContent = Math.round(scale * 100);
+            
+            // 更新按钮状态
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= pdfDoc.numPages;
+            
+            // 更新跳转输入框
+            jumpInput.value = currentPage;
+            jumpInput.max = pdfDoc.numPages;
+        }
+        
+        // 初始化PDF
+        function initPdf() {
+            console.log('开始加载PDF:', pdfPath);
+            
+            // 显示加载状态
+            pdfViewer.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">正在加载支付体系报告...</div></div>';
+            
+            // 加载PDF文档
+            pdfjsLib.getDocument({
+                url: pdfPath,
+                cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/cmaps/',
+                cMapPacked: true
+            }).promise.then(function(pdf) {
+                console.log('PDF加载成功:', pdf);
+                pdfDoc = pdf;
+                pageCountElem.textContent = pdfDoc.numPages;
+                renderPage(currentPage);
+            }).catch(function(error) {
+                console.error('加载PDF失败:', error);
+                
+                // 显示详细的错误信息
+                pdfViewer.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>无法加载PDF文件</h2>
+                        <p><strong>错误原因:</strong> ${error.message || '未知错误'}</p>
+                        <p><strong>文件路径:</strong> ${pdfPath}</p>
+                        <p><strong>可能原因:</strong></p>
+                        <ul>
+                            <li>文件路径不正确</li>
+                            <li>浏览器安全限制（跨域问题）</li>
+                            <li>PDF文件损坏</li>
+                            <li>PDF文件未放置在项目目录中</li>
+                        </ul>
+                        <p><strong>解决方案:</strong></p>
+                        <ol>
+                            <li>使用VS Code的Live Server扩展运行此页面</li>
+                            <li>检查PDF文件是否存在于项目根目录</li>
+                            <li>确认文件名为：2020_payment_system_report.pdf</li>
+                            <li>检查控制台错误信息（按F12）</li>
+                        </ol>
+                    </div>
+                `;
+            });
+        }
+        
+        // 事件监听
+        prevPageBtn.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        });
+        
+        nextPageBtn.addEventListener('click', function() {
+            if (currentPage < pdfDoc.numPages) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        });
+        
+        zoomInBtn.addEventListener('click', function() {
+            if (scale < 2.0) {
+                scale += 0.1;
+                scale = Math.round(scale * 10) / 10;
+                renderPage(currentPage);
+            }
+        });
+        
+        zoomOutBtn.addEventListener('click', function() {
+            if (scale > 0.5) {
+                scale -= 0.1;
+                scale = Math.round(scale * 10) / 10;
+                renderPage(currentPage);
+            }
+        });
+        
+        jumpBtn.addEventListener('click', function() {
+            const pageNum = parseInt(jumpInput.value);
+            if (pageNum >= 1 && pageNum <= pdfDoc.numPages) {
+                currentPage = pageNum;
+                renderPage(currentPage);
+            }
+        });
+        
+        jumpInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                jumpBtn.click();
+            }
+        });
+        
+        fullscreenBtn.addEventListener('click', function() {
+            const element = document.getElementById('pdf-container');
+            if (!document.fullscreenElement) {
+                if (element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if (element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if (element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        });
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', initPdf);
+    </script>
+</body>
+</html>

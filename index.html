@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>支付体系报告查看器 - 2020年</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>审计观察 - 移动端优化版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
@@ -20,7 +20,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 12px;
             color: #333;
             overflow-x: hidden;
         }
@@ -31,9 +31,9 @@
             align-items: center;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -45,68 +45,70 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 4px;
             background: linear-gradient(90deg, #1a237e, #ff9800, #1a237e);
         }
         
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: #1a237e;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         
         .logo i {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: #fff;
         }
         
         .header h1 {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             color: #1a237e;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .header p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #555;
             max-width: 800px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         
         .year-badge {
             background: #ff9800;
             color: white;
-            padding: 5px 20px;
+            padding: 4px 16px;
             border-radius: 20px;
-            font-size: 1.1rem;
-            margin-top: 15px;
+            font-size: 1rem;
+            margin-top: 12px;
             display: inline-block;
-            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
         }
         
         .container {
             display: flex;
-            gap: 25px;
+            flex-direction: column;
+            gap: 15px;
             width: 100%;
             flex: 1;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .viewer-container {
-            flex: 3;
+            flex: 1;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
+            min-height: 50vh;
         }
         
         #pdf-container {
@@ -121,59 +123,63 @@
             border-radius: 10px;
             overflow: auto;
             background: #f5f7fa;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
-            min-height: 600px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            min-height: 400px;
         }
         
         .pdf-page {
-            margin: 20px 0;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             border: 1px solid #ddd;
             transition: transform 0.3s ease;
+            /* 提高清晰度 */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            max-width: 100%;
         }
         
         .pdf-page:hover {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
         
         .controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 12px 0;
             border-top: 1px solid #eee;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px;
         }
         
         .btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             background: #1a237e;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-weight: 500;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         
         .btn:hover {
             background: #ff9800;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         
         .btn:disabled {
@@ -184,46 +190,44 @@
         }
         
         .btn.zoom {
-            padding: 10px 15px;
+            padding: 8px 12px;
         }
         
         .page-info {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #1a237e;
             background: #e8eaf6;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 50px;
-            min-width: 120px;
+            min-width: 100px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .zoom-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .zoom-level {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #555;
             background: #f8f9fa;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 50px;
             font-weight: 500;
-            min-width: 80px;
+            min-width: 70px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
         }
         
         .info-panel {
-            flex: 1;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            min-width: 300px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
         }
@@ -231,34 +235,34 @@
         .panel-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
             border-bottom: 3px solid #ff9800;
         }
         
         .panel-header i {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             color: #1a237e;
         }
         
         .panel-header h2 {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: #1a237e;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .report-info {
             flex: 1;
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
         }
         
         .info-item {
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
             display: flex;
             flex-direction: column;
@@ -271,111 +275,117 @@
         .info-label {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 8px;
+            margin-bottom: 6px;
         }
         
         .info-label i {
             color: #1a237e;
-            font-size: 1.1rem;
-            width: 24px;
+            font-size: 1rem;
+            width: 20px;
             text-align: center;
         }
         
         .info-label span {
             font-weight: 600;
             color: #1a237e;
+            font-size: 0.95rem;
         }
         
         .info-value {
-            padding: 10px 15px;
+            padding: 8px 12px;
             background: white;
             border-radius: 8px;
             border: 1px solid #ddd;
             word-break: break-word;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
         }
         
         .highlights {
-            margin-top: 15px;
+            margin-top: 12px;
         }
         
         .highlight {
             display: flex;
-            gap: 10px;
-            padding: 12px;
+            gap: 8px;
+            padding: 10px;
             background: #e3f2fd;
             border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease;
+            font-size: 0.9rem;
         }
         
         .highlight:hover {
-            transform: translateX(5px);
+            transform: translateX(3px);
             background: #bbdefb;
         }
         
         .highlight i {
             color: #1a237e;
-            font-size: 1.2rem;
-            margin-top: 3px;
+            font-size: 1.1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
         }
         
         .navigation-tools {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 15px;
         }
         
         .tool {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .tool label {
             font-weight: 600;
             color: #1a237e;
-            min-width: 70px;
+            min-width: 60px;
+            font-size: 0.9rem;
         }
         
         #jump-input {
-            padding: 10px 15px;
+            padding: 8px 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            width: 80px;
-            font-size: 1rem;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 70px;
+            font-size: 0.9rem;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .instructions {
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             flex: 1;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
         }
         
         .instructions h3 {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             color: #1a237e;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
         }
         
         .instructions ul {
-            padding-left: 25px;
+            padding-left: 20px;
         }
         
         .instructions li {
-            margin-bottom: 12px;
-            line-height: 1.6;
+            margin-bottom: 10px;
+            line-height: 1.5;
             position: relative;
             padding-left: 15px;
+            font-size: 0.9rem;
         }
         
         .instructions li:before {
@@ -388,10 +398,10 @@
         
         .footer {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             position: relative;
         }
         
@@ -401,14 +411,14 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 4px;
             background: linear-gradient(90deg, #1a237e, #ff9800, #1a237e);
         }
         
         .footer p {
             color: #555;
-            font-size: 1rem;
-            margin: 5px 0;
+            font-size: 0.9rem;
+            margin: 4px 0;
         }
         
         .footer p:first-child {
@@ -420,14 +430,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+            padding: 20px;
         }
         
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(26, 35, 126, 0.2);
-            border-top: 5px solid #1a237e;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(26, 35, 126, 0.2);
+            border-top: 4px solid #1a237e;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -438,56 +449,132 @@
         }
         
         .loading-text {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #1a237e;
             font-weight: 500;
+            text-align: center;
         }
         
         .error-message {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
             color: #f44336;
-            max-width: 600px;
+            max-width: 100%;
             margin: 0 auto;
+            font-size: 0.9rem;
         }
         
         .error-message i {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
             display: block;
             color: #f44336;
         }
         
         .error-message h2 {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
         }
         
         .error-message p {
-            margin: 10px 0;
-            line-height: 1.6;
+            margin: 8px 0;
+            line-height: 1.5;
         }
         
         .error-message ul, .error-message ol {
             text-align: left;
-            margin: 20px 0;
-            padding-left: 30px;
+            margin: 15px 0;
+            padding-left: 25px;
         }
         
         .error-message li {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
         
-        @media (max-width: 1100px) {
-            .container {
-                flex-direction: column;
+        /* 移动设备特定优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            
+            .header {
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .logo i {
+                font-size: 2rem;
             }
             
             .header h1 {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .year-badge {
+                font-size: 0.9rem;
+                padding: 3px 12px;
+            }
+            
+            .viewer-container,
+            .info-panel {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            
+            .panel-header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .controls {
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+            
+            .page-info {
+                font-size: 0.9rem;
+                padding: 6px 14px;
+            }
+            
+            .zoom-level {
+                font-size: 0.85rem;
+                padding: 5px 10px;
+            }
+            
+            .highlight {
+                font-size: 0.85rem;
+                padding: 8px;
+            }
+            
+            .highlight i {
+                font-size: 1rem;
+            }
+            
+            .footer {
+                padding: 12px;
             }
         }
         
-        @media (max-width: 600px) {
+        /* 小屏幕设备 */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
             .controls {
                 flex-direction: column;
             }
@@ -503,6 +590,7 @@
             .tool {
                 flex-direction: column;
                 align-items: flex-start;
+                width: 100%;
             }
             
             #jump-input {
@@ -511,12 +599,22 @@
             
             #jump-btn {
                 width: 100%;
+                margin-top: 5px;
             }
             
             .btn {
                 width: 100%;
                 justify-content: center;
             }
+        }
+        
+        /* PDF清晰度增强 */
+        .pdf-canvas {
+            max-width: 100%;
+            height: auto;
+            /* 提高移动端渲染质量 */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
     </style>
 </head>
@@ -525,10 +623,10 @@
         <div class="logo">
             <i class="fas fa-file-invoice-dollar"></i>
         </div>
-        <h1>2020年支付体系运行总体情况</h1>
-        <p>中国人民银行支付结算司发布的年度支付体系运行报告</p>
+        <h1>审计观察第一期</h1>
+        <p>编制：审计部</p>
         <div class="year-badge">
-            <i class="fas fa-calendar-alt"></i> 2020年度报告
+            <i class="fas fa-calendar-alt"></i> 2025年6月
         </div>
     </div>
     
@@ -571,52 +669,32 @@
         <div class="info-panel">
             <div class="panel-header">
                 <i class="fas fa-info-circle"></i>
-                <h2>报告信息</h2>
+                <h2>信息速览</h2>
             </div>
             
             <div class="report-info">
                 <div class="info-item">
                     <div class="info-label">
-                        <i class="fas fa-file-pdf"></i>
-                        <span>文件名称:</span>
-                    </div>
-                    <div class="info-value">2020_payment_system_report.pdf</div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="fas fa-building"></i>
-                        <span>发布机构:</span>
-                    </div>
-                    <div class="info-value">中国人民银行支付结算司</div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="fas fa-calendar"></i>
-                        <span>发布日期:</span>
-                    </div>
-                    <div class="info-value">2021年3月</div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-label">
                         <i class="fas fa-chart-line"></i>
-                        <span>核心数据:</span>
+                        <span>主要看点:</span>
                     </div>
                     <div class="info-value">
                         <div class="highlights">
                             <div class="highlight">
                                 <i class="fas fa-money-check-alt"></i>
-                                <div>非现金支付业务金额同比增长24.1%</div>
+                                <div>行内动态：以两个基因和三构形成高质量发展路径</div>
                             </div>
                             <div class="highlight">
                                 <i class="fas fa-credit-card"></i>
-                                <div>银行卡交易金额同比增长12.0%</div>
+                                <div>行外动态：人行有序推进人工智能大模型在金融领域应用</div>
                             </div>
                             <div class="highlight">
                                 <i class="fas fa-mobile-alt"></i>
-                                <div>移动支付业务同比增长25.1%</div>
+                                <div>行外动态：国办印发金融五篇大文章指导意见</div>
+                            </div>
+                            <div class="highlight">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>多家银行部署DEEPSEEK</div>
                             </div>
                         </div>
                     </div>
@@ -636,25 +714,9 @@
                     </button>
                 </div>
             </div>
-            
-            <div class="instructions">
-                <h3><i class="fas fa-lightbulb"></i> 使用说明</h3>
-                <ul>
-                    <li>使用"上一页/下一页"按钮浏览报告</li>
-                    <li>使用缩放按钮调整页面大小（+/-）</li>
-                    <li>输入页码并按Enter键跳转至指定页</li>
-                    <li>全屏模式提供更好的阅读体验</li>
-                    <li>使用VS Code的Live Server运行此页面</li>
-                    <li>确保PDF文件位于项目根目录</li>
-                </ul>
-            </div>
         </div>
     </div>
-    
-    <div class="footer">
-        <p>© 2023 支付体系报告查看器 | 基于PDF.js构建 | 项目文件夹: PAY-VIEWER</p>
-        <p>提示: 使用VS Code的Live Server扩展运行此页面</p>
-    </div>
+
 
     <script>
         // 设置PDF.js worker路径
@@ -677,22 +739,39 @@
         let pdfDoc = null;
         let currentPage = 1;
         let scale = 1.2;
+        let isMobile = window.innerWidth <= 768;
         
         // 指定PDF文件路径（相对路径）
         const pdfPath = './2020_payment_system_report.pdf';
         
-        // 渲染PDF页面
+        // 渲染PDF页面（优化版）
         function renderPage(num) {
             pdfViewer.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">正在加载第 ' + num + ' 页...</div></div>';
             
             pdfDoc.getPage(num).then(function(page) {
-                const viewport = page.getViewport({ scale: scale });
+                // 在移动设备上自动调整缩放比例
+                if (isMobile) {
+                    const containerWidth = pdfViewer.clientWidth - 30; // 减去内边距
+                    const viewport = page.getViewport({ scale: 1 });
+                    scale = containerWidth / viewport.width;
+                    
+                    // 限制缩放范围
+                    scale = Math.max(0.6, Math.min(scale, 1.8));
+                }
+                
+                const viewport = page.getViewport({ 
+                    scale: scale,
+                    // 提高移动端渲染质量
+                    devicePixelRatio: window.devicePixelRatio || 1
+                });
+                
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
+                canvas.className = 'pdf-canvas';
                 
+                // 设置高清画布
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-                canvas.className = 'pdf-page';
                 
                 const renderContext = {
                     canvasContext: context,
@@ -789,6 +868,7 @@
             if (scale < 2.0) {
                 scale += 0.1;
                 scale = Math.round(scale * 10) / 10;
+                isMobile = false; // 用户手动缩放后不再自动调整
                 renderPage(currentPage);
             }
         });
@@ -797,6 +877,7 @@
             if (scale > 0.5) {
                 scale -= 0.1;
                 scale = Math.round(scale * 10) / 10;
+                isMobile = false; // 用户手动缩放后不再自动调整
                 renderPage(currentPage);
             }
         });
@@ -833,6 +914,14 @@
                 } else if (document.msExitFullscreen) {
                     document.msExitFullscreen();
                 }
+            }
+        });
+        
+        // 响应窗口大小变化
+        window.addEventListener('resize', function() {
+            isMobile = window.innerWidth <= 768;
+            if (pdfDoc) {
+                renderPage(currentPage);
             }
         });
         

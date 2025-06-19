@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>审计观察 - 移动端优化版</title>
+    <title>审计观察</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
@@ -109,6 +109,7 @@
             display: flex;
             flex-direction: column;
             min-height: 50vh;
+            transition: all 0.3s ease;
         }
         
         #pdf-container {
@@ -230,6 +231,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
+            transition: all 0.3s ease;
         }
         
         .panel-header {
@@ -492,6 +494,53 @@
             font-size: 0.9rem;
         }
         
+        /* 全屏模式样式 */
+        .viewer-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            border-radius: 0;
+            padding: 10px;
+            overflow: auto;
+        }
+        
+        .viewer-container.fullscreen #pdf-viewer {
+            min-height: calc(100vh - 120px);
+        }
+        
+        .viewer-container.fullscreen .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            border-radius: 0;
+            z-index: 10001;
+        }
+        
+        .viewer-container.fullscreen #exit-fullscreen {
+            display: block;
+        }
+        
+        #exit-fullscreen {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10002;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
         /* 移动设备特定优化 */
         @media (max-width: 768px) {
             body {
@@ -566,6 +615,11 @@
             
             .footer {
                 padding: 12px;
+            }
+            
+            /* 移动设备上隐藏信息面板 */
+            .viewer-container.fullscreen + .info-panel {
+                display: none;
             }
         }
         
@@ -716,7 +770,14 @@
             </div>
         </div>
     </div>
-
+    
+    <div class="footer">
+        <p>审计部 © 2025 版权所有</p>
+    </div>
+    
+    <button id="exit-fullscreen">
+        <i class="fas fa-compress"></i>
+    </button>
 
     <script>
         // 设置PDF.js worker路径
@@ -734,15 +795,25 @@
         const jumpInput = document.getElementById('jump-input');
         const jumpBtn = document.getElementById('jump-btn');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const exitFullscreenBtn = document.getElementById('exit-fullscreen');
+        const viewerContainer = document.querySelector('.viewer-container');
         
         // 初始化变量
         let pdfDoc = null;
         let currentPage = 1;
-        let scale = 1.2;
+        let scale = 1.2; // 默认120%缩放
         let isMobile = window.innerWidth <= 768;
         
         // 指定PDF文件路径（相对路径）
         const pdfPath = './2020_payment_system_report.pdf';
+        
+        // 根据设备类型设置默认缩放比例
+        function setDefaultScale() {
+            isMobile = window.innerWidth <= 768;
+            // 移动设备使用200%缩放，电脑使用120%
+            scale = isMobile ? 2.0 : 1.2;
+            zoomPercentElem.textContent = Math.round(scale * 100);
+        }
         
         // 渲染PDF页面（优化版）
         function renderPage(num) {
@@ -753,10 +824,12 @@
                 if (isMobile) {
                     const containerWidth = pdfViewer.clientWidth - 30; // 减去内边距
                     const viewport = page.getViewport({ scale: 1 });
-                    scale = containerWidth / viewport.width;
+                    const calculatedScale = containerWidth / viewport.width;
                     
-                    // 限制缩放范围
-                    scale = Math.max(0.6, Math.min(scale, 1.8));
+                    // 限制缩放范围（0.6-1.8），但保留用户设置的缩放
+                    if (scale < 0.6 || scale > 1.8) {
+                        scale = Math.max(0.6, Math.min(calculatedScale, 1.8));
+                    }
                 }
                 
                 const viewport = page.getViewport({ 
@@ -806,6 +879,9 @@
         // 初始化PDF
         function initPdf() {
             console.log('开始加载PDF:', pdfPath);
+            
+            // 设置默认缩放比例
+            setDefaultScale();
             
             // 显示加载状态
             pdfViewer.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">正在加载支付体系报告...</div></div>';
@@ -896,30 +972,39 @@
             }
         });
         
-        fullscreenBtn.addEventListener('click', function() {
-            const element = document.getElementById('pdf-container');
-            if (!document.fullscreenElement) {
-                if (element.requestFullscreen) {
-                    element.requestFullscreen();
-                } else if (element.webkitRequestFullscreen) {
-                    element.webkitRequestFullscreen();
-                } else if (element.msRequestFullscreen) {
-                    element.msRequestFullscreen();
-                }
+        // 全屏功能
+        function toggleFullscreen() {
+            if (!viewerContainer.classList.contains('fullscreen')) {
+                // 进入全屏
+                viewerContainer.classList.add('fullscreen');
+                document.body.style.overflow = 'hidden';
+                exitFullscreenBtn.style.display = 'block';
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
+                // 退出全屏
+                viewerContainer.classList.remove('fullscreen');
+                document.body.style.overflow = '';
+                exitFullscreenBtn.style.display = 'none';
             }
-        });
+            
+            // 重新渲染页面以适应新尺寸
+            if (pdfDoc) {
+                renderPage(currentPage);
+            }
+        }
+        
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        exitFullscreenBtn.addEventListener('click', toggleFullscreen);
         
         // 响应窗口大小变化
         window.addEventListener('resize', function() {
-            isMobile = window.innerWidth <= 768;
+            // 更新设备类型判断
+            const newIsMobile = window.innerWidth <= 768;
+            if (newIsMobile !== isMobile) {
+                isMobile = newIsMobile;
+                setDefaultScale();
+            }
+            
+            // 重新渲染页面
             if (pdfDoc) {
                 renderPage(currentPage);
             }
